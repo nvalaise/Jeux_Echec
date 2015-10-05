@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_echec" default="compile.module.echec">
+  <dirname property="module.echec.basedir" file="${ant.file.module_echec}"/>
+  
+  <property name="module.jdk.home.echec" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.echec" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.echec" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.echec" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
+  
+  <property name="echec.output.dir" value="${module.echec.basedir}/out/production/Echec"/>
+  <property name="echec.testoutput.dir" value="${module.echec.basedir}/out/test/Echec"/>
+  
+  <path id="echec.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="echec.module.production.classpath">
+    <path refid="${module.jdk.classpath.echec}"/>
+    <pathelement location="${basedir}/lib/jars/lwjgl.jar"/>
+    <pathelement location="${basedir}/lib/jars/slick.jar"/>
+  </path>
+  
+  <path id="echec.runtime.production.module.classpath">
+    <pathelement location="${echec.output.dir}"/>
+    <pathelement location="${basedir}/lib/jars/lwjgl.jar"/>
+    <pathelement location="${basedir}/lib/jars/slick.jar"/>
+  </path>
+  
+  <path id="echec.module.classpath">
+    <path refid="${module.jdk.classpath.echec}"/>
+    <pathelement location="${echec.output.dir}"/>
+    <pathelement location="${basedir}/lib/jars/lwjgl.jar"/>
+    <pathelement location="${basedir}/lib/jars/slick.jar"/>
+  </path>
+  
+  <path id="echec.runtime.module.classpath">
+    <pathelement location="${echec.testoutput.dir}"/>
+    <pathelement location="${echec.output.dir}"/>
+    <pathelement location="${basedir}/lib/jars/lwjgl.jar"/>
+    <pathelement location="${basedir}/lib/jars/slick.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.echec">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.echec">
+    <patternset refid="excluded.from.module.echec"/>
+  </patternset>
+  
+  <path id="echec.module.sourcepath">
+    <dirset dir="${module.echec.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.echec" depends="compile.module.echec.production,compile.module.echec.tests" description="Compile module Echec"/>
+  
+  <target name="compile.module.echec.production" depends="register.custom.compilers" description="Compile module Echec; production classes">
+    <mkdir dir="${echec.output.dir}"/>
+    <javac2 destdir="${echec.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.echec}/javac">
+      <compilerarg line="${compiler.args.echec}"/>
+      <bootclasspath refid="echec.module.bootclasspath"/>
+      <classpath refid="echec.module.production.classpath"/>
+      <src refid="echec.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.echec"/>
+    </javac2>
+    
+    <copy todir="${echec.output.dir}">
+      <fileset dir="${module.echec.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.echec.tests" depends="register.custom.compilers,compile.module.echec.production" description="compile module Echec; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.echec" description="cleanup module">
+    <delete dir="${echec.output.dir}"/>
+    <delete dir="${echec.testoutput.dir}"/>
+  </target>
+</project>
